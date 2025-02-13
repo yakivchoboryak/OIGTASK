@@ -15,7 +15,7 @@ namespace SurveyManagement.App.Controllers
 
         //paginated view of surveys
         [HttpGet]
-        public async Task<IActionResult> SurveyList(int page = 1, int pageSize = 1)
+        public async Task<IActionResult> SurveyList(int page = 1, int pageSize = 2)
         {
             var (surveys, totalCount) = await _surveyService.GetPaginatedSurveysAsync(page, pageSize);
             ViewBag.TotalCount = totalCount;
