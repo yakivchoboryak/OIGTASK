@@ -1,0 +1,61 @@
+﻿@model List<SurveyManagement.Domain.Entities.Survey>
+
+@{
+    ViewData["Title"] = "Survey List";
+    int page = ViewBag.Page;
+    int pageSize = ViewBag.PageSize;
+    int totalCount = ViewBag.TotalCount;
+    int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+}
+
+<h2>Surveys</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<a href="@Url.Action("Create", "Surveys")" class="btn btn-success mb-3">Create New Survey</a>
+
+@* TODO: ADD SEARCH *@
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var survey in Model)
+        {
+            <tr>
+                <td>@survey.Name</td>
+                <td>@survey.StartDate</td>
+                <td>@survey.EndDate</td>
+                <td>
+                    <a href="@Url.Action("Survey", "Surveys", new { id = survey.Id })" class="btn btn-primary btn-sm">Edit</a>
+                    <form method="post" action="@Url.Action("Delete", "Surveys", new { id = survey.Id })" style="display:inline;">
+                        <input type="hidden" name="id" value="@survey.Id" />
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<nav>
+    <ul class="pagination">
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <li class="page-item @(i == page ? "active" : "")">
+                <a class="page-link" href="@Url.Action("SurveyList", "Surveys", new { page = i, pageSize = pageSize })">@i</a>
+            </li>
+        }
+    </ul>
+</nav>

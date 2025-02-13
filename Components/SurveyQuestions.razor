@@ -1,0 +1,102 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@using global::SurveyManagement.Domain.Entities
+@using global::SurveyManagement.App.Interfaces
+@inject ISurveyService SurveyService
+
+@code {
+    [Parameter]
+    public int SurveyId { get; set; }
+
+    private List<SurveyQuestion> Questions { get; set; } = new();
+    private SurveyQuestion newQuestion = new();
+    private Survey? survey = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        survey = await SurveyService.GetSurveyByIdAsync(SurveyId) ?? new Survey();
+        survey.Name ??= "";
+        survey.Description ??= "";
+
+        Questions = await SurveyService.GetSurveyQuestionsAsync(SurveyId);
+        newQuestion.SurveyId = SurveyId;
+    }
+
+    async Task HandleSubmitQuestion()
+    {
+        await SurveyService.AddQuestionAsync(SurveyId, newQuestion.QuestionText, newQuestion.QuestionType);
+        Questions = await SurveyService.GetSurveyQuestionsAsync(SurveyId);
+        newQuestion = new SurveyQuestion();
+    }
+
+    async Task SaveSurveyDetails()
+    {
+        if (survey != null)
+        {
+            await SurveyService.UpdateSurveyAsync(survey);
+        }
+    }
+}
+
+@if (survey != null)
+{
+    <EditForm Model="@survey" OnValidSubmit="SaveSurveyDetails">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div>
+            <label>Name:</label>
+            <InputText @bind-Value="survey.Name" class="form-control" />
+        </div>
+
+        <div>
+            <label>Description:</label>
+            <InputTextArea @bind-Value="survey.Description" class="form-control" />
+        </div>
+
+        <div>
+            <label>Start Date:</label>
+            <InputDate @bind-Value="survey.StartDate" class="form-control" />
+        </div>
+
+        <div>
+            <label>End Date:</label>
+            <InputDate @bind-Value="survey.EndDate" class="form-control" />
+        </div>
+
+        <div>
+            <label>Status:</label>
+            <InputSelect @bind-Value="survey.Status" class="form-control">
+                @foreach (var status in Enum.GetValues(typeof(SurveyStatus)))
+                {
+                    <option value="@status">@status</option>
+                }
+            </InputSelect>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-2">Save</button>
+    </EditForm>
+}
+
+<h3>Add a Question</h3>
+<EditForm Model="@newQuestion" OnValidSubmit="HandleSubmitQuestion">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Question Text:</label>
+        <InputText @bind-Value="newQuestion.QuestionText" class="form-control" />
+    </div>
+
+    <div>
+        <label>Question Type:</label>
+        <InputSelect @bind-Value="newQuestion.QuestionType" class="form-control">
+            <option value="0">Text</option>
+            <option value="1">Multiple Choice</option>
+            <option value="2">Checkbox</option>
+            <option value="3">Numeric</option>
+        </InputSelect>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">Add Question</button>
+</EditForm>

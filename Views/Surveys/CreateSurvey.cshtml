@@ -1,0 +1,51 @@
+﻿@using SurveyManagement.Domain.Entities
+@model SurveyManagement.Domain.Entities.Survey
+
+<h2>Create New Survey</h2>
+@* TODO: ADD VALIDATION *@
+
+<form method="post" asp-action="Create">
+    <div class="mb-3">
+        <label class="form-label">Name</label>
+        <input asp-for="Name" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Description</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Start Date</label>
+        <input asp-for="StartDate" type="datetime-local" class="form-control" required/>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">End Date</label>
+        <input asp-for="EndDate" type="datetime-local" class="form-control" required" />
+    </div>
+
+    <input type="hidden" asp-for="CreatedById" value="1" />
+
+    <div class="mb-3">
+        <label class="form-label">Status</label>
+        <select asp-for="Status" class="form-control">
+            @foreach (var status in Enum.GetValues(typeof(SurveyStatus)))
+            {
+                <option value="@status">@status</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let now = new Date();
+        let formattedNow = now.toISOString().slice(0, 16);
+
+        document.getElementById("StartDate").value = formattedNow;
+        document.getElementById("EndDate").value = formattedNow;
+    });
+</script>

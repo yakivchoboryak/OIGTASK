@@ -1,0 +1,92 @@
+﻿@using SurveyManagement.Domain.Entities
+@model Survey
+
+@{
+    ViewData["Title"] = "Survey Details";
+}
+
+@* TODO: ADD VALIDATION *@
+
+<h2>Survey Details</h2>
+
+<form method="post" asp-controller="Surveys" asp-action="UpdateSurvey">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="CreatedById" value="@((Model.CreatedById ==null || Model.CreatedById == 0) ? 1 : Model.CreatedById)" />
+
+    <div class="mb-3">
+        <label class="form-label">Name</label>
+        <input asp-for="Name" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Description</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Start Date</label>
+        <input asp-for="StartDate" type="datetime-local" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">End Date</label>
+        <input asp-for="EndDate" type="datetime-local" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Status</label>
+        <select asp-for="Status" class="form-control">
+            @foreach (var status in Enum.GetValues(typeof(SurveyStatus)))
+            {
+                <option value="@status">@status</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+<hr />
+
+<h3>Survey Questions</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Question</th>
+            <th>Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var question in Model.SurveyQuestions)
+        {
+            <tr>
+                <td>@question.QuestionText</td>
+                <td>@question.QuestionType</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h3>Add a Question</h3>
+
+<form method="post" asp-controller="Surveys" asp-action="AddQuestion">
+    <input type="hidden" name="SurveyId" value="@Model.Id" />
+
+    <div class="mb-3">
+        <label class="form-label">Question Text</label>
+        <input name="QuestionText" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Question Type</label>
+        <select name="QuestionType" class="form-control">
+            <option value="0">Text</option>
+            <option value="1">Multiple Choice</option>
+            <option value="2">Checkbox</option>
+            <option value="3">Numeric</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">Add Question</button>
+</form>
